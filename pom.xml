@@ -13,6 +13,8 @@
 		<module>jrpc-serializer</module>
 		<module>jrpc-transfer</module>
 		<module>jrpc-example</module>
+		<module>jrpc-connector</module>
+		<module>jrpc-collector</module>
 	</modules>
 
 	<dependencies>

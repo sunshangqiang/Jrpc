@@ -1,10 +1,9 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import com.lingfeng.jrpc.AbstractJrpcConnector;
+import com.lingfeng.jrpc.JrpcConnector;
 import com.lingfeng.jrpc.JrpcChannel;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
@@ -15,6 +14,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -24,20 +25,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class NettyJrpcConnector extends AbstractJrpcConnector {
+public class NettyJrpcConnector extends JrpcConnector {
 
 	private EventLoopGroup child = null;
 
-	public JrpcChannel connect(String ip, int port, long timeoutMills) {
+	public JrpcChannel connect(String ip, int port, long connecTimeoutMills) {
+		ChannelFuture cf = boot()
+				.connect(ip, port);
+		try {
+			cf.await(connecTimeoutMills, TimeUnit.MILLISECONDS);
+			if (cf.isSuccess()) {
+				return new NettyJrpcChannel(cf.channel());
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return null;
-	}
-
-	public void startup() {
-
-	}
-
-	public void shutdown() {
-
 	}
 
 	private Bootstrap boot() {
@@ -57,10 +60,8 @@ public class NettyJrpcConnector extends AbstractJrpcConnector {
 				.option(ChannelOption.TCP_NODELAY, true)
 				.option(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)
 				.option(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)
-				.handler(new ChannelInitializer<Channel>() {
-					protected void initChannel(Channel ch) throws Exception {
-
-					}
-				});
+				.handler(new NettyConnectorChannelInitializer(this));
 	}
+
+
 }

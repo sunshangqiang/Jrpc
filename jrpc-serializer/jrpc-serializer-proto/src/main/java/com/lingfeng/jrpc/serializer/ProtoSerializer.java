@@ -22,6 +22,14 @@ public class ProtoSerializer implements JrpcSerializer {
 
 	@Override
 	public <T> T unserialize(byte[] bytes, Class<T> clazz) {
-		return null;
+		Schema schema = RuntimeSchema.getSchema(clazz);
+		T t;
+		try {
+			t = clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			return null;
+		}
+		ProtostuffIOUtil.mergeFrom(bytes, t, schema);
+		return t;
 	}
 }

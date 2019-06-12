@@ -10,6 +10,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>jrpc-serializer</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>jrpc-serializer-proto</module>
+	</modules>
 
 
 </project>
