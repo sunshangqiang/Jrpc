@@ -1,6 +1,7 @@
 package com.lingfeng.jrpc.transfer.netty;
 
 import com.lingfeng.jrpc.JrpcMagicErrorException;
+import com.lingfeng.jrpc.JrpcService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class NettyJrpcDecoder extends ReplayingDecoder<NettyJrpcDecoder.State> {
 
-	private final static int MAGIC = 0xABAF;
+	private final static int MAGIC = JrpcService.MAGIC_CODE;
 
 	public enum State {
 

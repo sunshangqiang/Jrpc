@@ -11,4 +11,6 @@ public interface JrpcListener {
 
 	void fail(Throwable e);
 
+	void result(Object msg);
+
 }

@@ -23,18 +23,19 @@ public class NettyJrpcServer extends JrpcServer {
 	private EventLoopGroup child;
 
 	public JrpcServer start() {
+		log.info("NettyServer starting......");
 		ServerBootstrap sb = boot();
 		try {
 			ChannelFuture cf = sb
 					.bind(ip(), port())
 					.sync();
 			if (cf.isSuccess()) {
-				log.info("Netty collector start success");
+				log.info("Netty collector connect success");
 				return this;
 			}
-			log.info("Netty collector start fail");
+			log.info("Netty collector connect fail");
 		} catch (InterruptedException e) {
-			log.info("Netty collector start exception", e);
+			log.info("Netty collector connect exception", e);
 		}
 		return this;
 	}

@@ -7,7 +7,7 @@
 	<groupId>com.lingfeng.jrpc</groupId>
 	<artifactId>jrpc-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<modules>
 		<module>jrpc-core</module>
 		<module>jrpc-serializer</module>

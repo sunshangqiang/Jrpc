@@ -9,7 +9,7 @@ import lombok.Data;
  */
 
 @Data
-public abstract class JrpcServer {
+public abstract class JrpcServer implements JrpcService {
 
 	private final static String DEFAULT_BIND_IP = "0.0.0.0";
 
