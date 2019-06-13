@@ -5,5 +5,5 @@ package com.lingfeng.jrpc;
  * @Date: 2019-06-12 23:54
  * @Description:
  */
-public class MagicErrorJrpcException extends JrpcException {
+public class JrpcMagicErrorException extends JrpcException {
 }

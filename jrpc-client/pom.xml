@@ -9,7 +9,8 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>jrpc-collector</artifactId>
+	<artifactId>jrpc-client</artifactId>
+
 
 	<dependencies>
 		<dependency>
@@ -31,5 +32,7 @@
 		</dependency>
 
 	</dependencies>
+
+
 
 </project>

@@ -1,9 +1,10 @@
 package com.lingfeng.jrpc.connector;
 
 import com.lingfeng.jrpc.JrpcChannel;
+import com.lingfeng.jrpc.JrpcClientConnectException;
 import com.lingfeng.jrpc.JrpcListener;
 import com.lingfeng.jrpc.serializer.ProtoSerializer;
-import com.lingfeng.jrpc.transfer.netty.NettyJrpcConnector;
+import com.lingfeng.jrpc.transfer.netty.NettyJrpcClient;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -13,13 +14,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class JrpcConnectorStartup {
+public class JrpcClientStartup {
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws JrpcClientConnectException, InterruptedException {
 
-		JrpcChannel jrpcChannel = new NettyJrpcConnector()
+		JrpcChannel jrpcChannel = new NettyJrpcClient()
 				.serializer(new ProtoSerializer())
-				.connect("127.0.0.1", 18080);
+				.start("127.0.0.1", 18080);
 
 		int i = 0;
 

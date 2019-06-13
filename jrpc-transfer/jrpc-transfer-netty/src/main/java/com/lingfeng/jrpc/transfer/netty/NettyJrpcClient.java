@@ -1,7 +1,9 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import com.lingfeng.jrpc.JrpcConnector;
+import com.lingfeng.jrpc.JrpcClient;
 import com.lingfeng.jrpc.JrpcChannel;
+import com.lingfeng.jrpc.JrpcClientConnectException;
+import com.lingfeng.jrpc.JrpcListener;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -25,22 +27,35 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Slf4j
-public class NettyJrpcConnector extends JrpcConnector {
+public class NettyJrpcClient extends JrpcClient {
 
 	private EventLoopGroup child = null;
 
-	public JrpcChannel connect(String ip, int port, long connecTimeoutMills) {
+	public State start(String ip, int port) throws JrpcClientConnectException {
+		state(State.STARTING);
 		ChannelFuture cf = boot()
 				.connect(ip, port);
 		try {
-			cf.await(connecTimeoutMills, TimeUnit.MILLISECONDS);
+			cf.await(connectTimeoutMills, TimeUnit.MILLISECONDS);
 			if (cf.isSuccess()) {
-				return new NettyJrpcChannel(cf.channel());
+				JRPC_CHANNELS.add(this);
+				state(State.STARTED);
+				return State.STARTED;
 			}
+			state(State.UNSTART);
+			throw new JrpcClientConnectException("NettyJrpcClient start server fail, server address:" + ip + ":" + port);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			state(State.UNSTART);
+			throw new JrpcClientConnectException("NettyJrpcClient start server exception, server address:" + ip + ":" + port, e);
 		}
-		return null;
+	}
+
+	public void sendMessage(Object message, JrpcListener jrpcListener) {
+
+	}
+
+	public boolean isActive() {
+		return false;
 	}
 
 	private Bootstrap boot() {
@@ -48,11 +63,11 @@ public class NettyJrpcConnector extends JrpcConnector {
 		final int cpu = Runtime.getRuntime().availableProcessors();
 		if (Epoll.isAvailable()) {
 			b
-					.group(child = new EpollEventLoopGroup(cpu, new DefaultThreadFactory("NettyJrpcConnector-Epoll")))
+					.group(child = new EpollEventLoopGroup(cpu, new DefaultThreadFactory("NettyJrpcClient-Epoll")))
 					.channel(EpollSocketChannel.class);
 		} else {
 			b
-					.group(child = new NioEventLoopGroup(cpu, new DefaultThreadFactory("NettyJrpcConnector-Nio")))
+					.group(child = new NioEventLoopGroup(cpu, new DefaultThreadFactory("NettyJrpcClient-Nio")))
 					.channel(NioSocketChannel.class);
 		}
 		return b
@@ -60,7 +75,15 @@ public class NettyJrpcConnector extends JrpcConnector {
 				.option(ChannelOption.TCP_NODELAY, true)
 				.option(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)
 				.option(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)
-				.handler(new NettyConnectorChannelInitializer(this));
+				.handler(new NettyJrpcClientChannelInitializer(this));
+	}
+
+	public void shutdown() {
+		log.info("NettyJrpcClient shutdown......");
+		if (child != null) {
+			child.shutdownGracefully();
+		}
+		log.info("NettyJrpcClient shutdown success");
 	}
 
 

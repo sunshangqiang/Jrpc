@@ -1,7 +1,9 @@
 package com.lingfeng.jrpc.transfer.netty;
 
 import com.lingfeng.jrpc.JrpcChannel;
+import com.lingfeng.jrpc.JrpcClient;
 import com.lingfeng.jrpc.JrpcListener;
+import com.lingfeng.jrpc.JrpcProtocol;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -12,12 +14,16 @@ import io.netty.channel.DefaultChannelPromise;
  * @Date: 2019-06-12 23:32
  * @Description:
  */
+
 public class NettyJrpcChannel implements JrpcChannel {
 
 	private Channel nettyChannel;
 
-	public NettyJrpcChannel(Channel nettyChannel) {
+	private JrpcClient client;
+
+	public NettyJrpcChannel(Channel nettyChannel, JrpcClient client) {
 		this.nettyChannel = nettyChannel;
+		this.client = client;
 	}
 
 	public JrpcChannel sendMessage(Object message, final JrpcListener jrpcListener) {
@@ -32,7 +38,9 @@ public class NettyJrpcChannel implements JrpcChannel {
 			return this;
 		}
 
-		nettyChannel.writeAndFlush(message)
+		nettyChannel.writeAndFlush(
+				new JrpcProtocol.JrpcRequest()
+						.msg(message))
 				.addListener(new ChannelFutureListener() {
 					public void operationComplete(ChannelFuture cf) throws Exception {
 						if (cf.isSuccess()) {

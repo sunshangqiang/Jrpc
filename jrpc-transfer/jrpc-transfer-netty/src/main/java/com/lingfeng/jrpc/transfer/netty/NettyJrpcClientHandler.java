@@ -1,7 +1,6 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import com.lingfeng.jrpc.JrpcCollector;
-import com.lingfeng.jrpc.JrpcSerializer;
+import com.lingfeng.jrpc.JrpcProtocol;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -14,10 +13,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class NettyJrpcHandler extends SimpleChannelInboundHandler {
+public class NettyJrpcClientHandler extends SimpleChannelInboundHandler<JrpcProtocol.JrpcResponse> {
 
-	protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-		log.info(o.toString());
+	protected void channelRead0(ChannelHandlerContext ctx, JrpcProtocol.JrpcResponse msg) throws Exception {
+		log.info(msg.toString());
 	}
 
 	@Override
@@ -32,7 +31,6 @@ public class NettyJrpcHandler extends SimpleChannelInboundHandler {
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-
 		if (evt instanceof IdleStateEvent) {
 
 

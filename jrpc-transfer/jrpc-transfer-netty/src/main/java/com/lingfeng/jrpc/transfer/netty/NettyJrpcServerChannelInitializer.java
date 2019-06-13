@@ -1,6 +1,6 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import com.lingfeng.jrpc.JrpcCollector;
+import com.lingfeng.jrpc.JrpcServer;
 import com.lingfeng.jrpc.JrpcSerializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit;
  * @Date: 2019-06-12 23:06
  * @Description:
  */
-public class NettyCollectorChannelInitializer extends ChannelInitializer {
+public class NettyJrpcServerChannelInitializer extends ChannelInitializer {
 
-	private JrpcCollector jrpcCollector;
+	private JrpcServer jrpcCollector;
 
-	public NettyCollectorChannelInitializer(JrpcCollector jrpcCollector) {
+	public NettyJrpcServerChannelInitializer(JrpcServer jrpcCollector) {
 		this.jrpcCollector = jrpcCollector;
 	}
 
@@ -27,9 +27,10 @@ public class NettyCollectorChannelInitializer extends ChannelInitializer {
 		final JrpcSerializer serializer = jrpcCollector.serializer();
 		ch
 				.pipeline()
-				.addLast(new NettyJrpcDecoder(serializer))
-				.addLast(new NettyJrpcEncoder(serializer))
+				.addLast(new NettyJrpcDecoder())
+				.addLast(new NettyJrpcEncoder())
+				.addLast(new NettyJrpcObjectAggregator(serializer, false))
 				.addLast(new IdleStateHandler(idleTimeoutMills, idleTimeoutMills, idleTimeoutMills, TimeUnit.MILLISECONDS))
-				.addLast(new NettyJrpcHandler());
+				.addLast(new NettyJrpcServerHandler());
 	}
 }

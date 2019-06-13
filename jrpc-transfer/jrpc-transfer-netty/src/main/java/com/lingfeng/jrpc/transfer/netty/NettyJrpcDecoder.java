@@ -1,8 +1,6 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import apple.laf.JRSUIConstants;
-import com.lingfeng.jrpc.JrpcSerializer;
-import com.lingfeng.jrpc.MagicErrorJrpcException;
+import com.lingfeng.jrpc.JrpcMagicErrorException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -18,8 +16,6 @@ public class NettyJrpcDecoder extends ReplayingDecoder<NettyJrpcDecoder.State> {
 
 	private final static int MAGIC = 0xABAF;
 
-	private JrpcSerializer serializer;
-
 	public enum State {
 
 		MAGIC,
@@ -32,13 +28,12 @@ public class NettyJrpcDecoder extends ReplayingDecoder<NettyJrpcDecoder.State> {
 
 	private int length;
 
-	public NettyJrpcDecoder(JrpcSerializer serializer) {
-		this(State.MAGIC, serializer);
+	public NettyJrpcDecoder() {
+		this(State.MAGIC);
 	}
 
-	public NettyJrpcDecoder(State initialState, JrpcSerializer serializer) {
+	public NettyJrpcDecoder(State initialState) {
 		super(initialState);
-		this.serializer = serializer;
 	}
 
 	protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> list) throws Exception {
@@ -52,7 +47,7 @@ public class NettyJrpcDecoder extends ReplayingDecoder<NettyJrpcDecoder.State> {
 				}
 				int _magic = in.readInt();
 				if (_magic != MAGIC) {
-					throw new MagicErrorJrpcException();
+					throw new JrpcMagicErrorException();
 				}
 				checkpoint(State.HEADER);
 			}
@@ -72,7 +67,7 @@ public class NettyJrpcDecoder extends ReplayingDecoder<NettyJrpcDecoder.State> {
 				}
 				byte[] bytes = new byte[length];
 				in.readBytes(bytes);
-				list.add(serializer.unserialize(bytes, String.class));
+				list.add(bytes);
 				checkpoint(State.MAGIC);
 			}
 		}

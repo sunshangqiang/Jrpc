@@ -1,6 +1,6 @@
 package com.lingfeng.jrpc.transfer.netty;
 
-import com.lingfeng.jrpc.JrpcCollector;
+import com.lingfeng.jrpc.JrpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -16,13 +16,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class NettyJrpcCollector extends JrpcCollector {
+public class NettyJrpcServer extends JrpcServer {
 
 	private EventLoopGroup main;
 
 	private EventLoopGroup child;
 
-	public JrpcCollector start() {
+	public JrpcServer start() {
 		ServerBootstrap sb = boot();
 		try {
 			ChannelFuture cf = sb
@@ -41,11 +41,19 @@ public class NettyJrpcCollector extends JrpcCollector {
 
 	public void shutdown() {
 		log.info("Netty collector shutdown......");
-		if (main != null) {
-			main.shutdownGracefully();
+		try {
+			if (main != null) {
+				main.shutdownGracefully();
+			}
+		} catch (Exception e) {
+			log.error("Netty collector shutdown main EventLoopGroup exception", e);
 		}
-		if (child != null) {
-			child.shutdownGracefully();
+		try {
+			if (child != null) {
+				child.shutdownGracefully();
+			}
+		} catch (Exception e) {
+			log.error("Netty collector shutdown child EventLoopGroup exception", e);
 		}
 		log.info("Netty collector shutdown done");
 	}
@@ -60,6 +68,6 @@ public class NettyJrpcCollector extends JrpcCollector {
 				.childOption(ChannelOption.SO_SNDBUF, 1024 * 1024)
 				.childOption(ChannelOption.SO_KEEPALIVE, true)
 				.childOption(ChannelOption.TCP_NODELAY, true)
-				.childHandler(new NettyCollectorChannelInitializer(NettyJrpcCollector.this));
+				.childHandler(new NettyJrpcServerChannelInitializer(NettyJrpcServer.this));
 	}
 }

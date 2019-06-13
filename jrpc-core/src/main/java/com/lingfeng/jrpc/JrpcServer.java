@@ -9,7 +9,7 @@ import lombok.Data;
  */
 
 @Data
-public abstract class JrpcCollector {
+public abstract class JrpcServer {
 
 	private final static String DEFAULT_BIND_IP = "0.0.0.0";
 
@@ -25,7 +25,7 @@ public abstract class JrpcCollector {
 
 	private JrpcSerializer serializer;
 
-	public abstract JrpcCollector start();
+	public abstract JrpcServer start();
 
 	public abstract void shutdown();
 

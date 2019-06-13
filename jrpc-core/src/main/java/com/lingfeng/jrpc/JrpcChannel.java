@@ -10,8 +10,5 @@ package com.lingfeng.jrpc;
 
 public interface JrpcChannel {
 
-	JrpcChannel sendMessage(Object message, JrpcListener jrpcListener);
-
-	boolean isActive();
 
 }
